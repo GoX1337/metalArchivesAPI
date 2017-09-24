@@ -1,6 +1,6 @@
 const req = require('./req');
 const db = require('./db');
-var config = require('./config');
+const config = require('./config');
 
 let query;
 
