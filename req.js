@@ -24,7 +24,7 @@ const startRequestBand = (query) => {
             totalRecords = resp.iTotalRecords;
             parseResponse(resp);
             for(let i = displayLength; i <= totalRecords; i += displayLength ){
-                delay += 5000;
+                delay += 200000;
                 setTimeout(()=>{requestBands(buildUrl(query, i, displayLength))}, delay);
             }
         }
@@ -43,6 +43,7 @@ const requestBands = (url) => {
 }
 
 const parseResponse = (resp) => {
+    let d = 0;
     resp.aaData.forEach(function(b) {
         let n = parseName(b[0]);
         let band = {
@@ -51,7 +52,8 @@ const parseResponse = (resp) => {
             "country": b[2],
             "url": n.url
         };
-        getBandDetails(band);
+        d += 1000;
+        setTimeout(()=>{getBandDetails(band)}, d);
     });
 }
 
