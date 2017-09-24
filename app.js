@@ -12,7 +12,7 @@ if(process.argv.length > 2){
 }
 
 db.connect(config.database, (err) => {
-    if (err) {
+    if(err) {
         console.log('Unable to connect to Mongo ' + config.database);
         process.exit(1);
     } else {

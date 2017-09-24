@@ -1,10 +1,10 @@
 # deathMetalAPI
 
-1) To start steal metal archives data:
+1) To start steal metal archives website data:
 
-node app.js "Death Metal"
+        node app.js "Death Metal"
 
 
-2) To start API
+2) To start API:
 
-node api.js
+        node api.js
