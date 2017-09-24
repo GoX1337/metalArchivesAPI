@@ -6,6 +6,7 @@ const db = require('./db');
 
 const router = express.Router();
 let nbTokens = 0;
+const maxPageSize = 100;
 
 router.post('/token', (req, res) => {
     if(req.body.password == "topkek"){
@@ -48,13 +49,25 @@ router.get('/bands', (req, res) => {
         if(req.query.country)
             params.country = new RegExp(["^", req.query.country.replace("_", " "), "$"].join(""), "i");
 
-        db.get().collection(genre).find(params).toArray((err, result) => {
-            if(!err){
-                res.status(200).send(result);
-            } else {
-                res.status(500).send(err);
+            let limit = parseInt(req.query.limit, 10);
+            if (isNaN(limit) || limit > maxPageSize) {
+                limit = maxPageSize;
+            } else if (limit < 1) {
+                limit = 1;
             }
-        });
+            let page = parseInt(req.query.page, 10);
+            if (isNaN(page) || page < 1) {
+                page = 1;
+            }
+            
+            db.get().collection(genre).find(params).skip((page - 1) * limit).limit(limit).toArray((err, result) => {
+                if(!err){
+                    let resp = { "data": result}
+                    res.status(200).send(resp);
+                } else {
+                    res.status(500).send(err);
+                }
+            });
     }
 });
 
