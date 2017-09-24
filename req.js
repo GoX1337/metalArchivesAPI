@@ -1,5 +1,6 @@
 const request = require('request');
 const cheerio = require('cheerio');
+const db = require('./db');
 
 let displayStart = 0;
 let displayLength = 200;
@@ -66,17 +67,23 @@ const getBandDetails = (band) => {
             console.log("error getBandDetails", JSON.stringify(error));
         } else {
             console.log("GET " + band.url);
-            const $ = cheerio.load(response.body);
-            let tab = $('#band_stats').find("dd");
-            /*band.location = tab[1].text.trim();
-            band.active = tab[2].text.trim();
-            band.formedInYear = tab[3].text.trim();
-            band.lyricsTheme = tab[5].text.trim();
-            band.label = tab[6].text.trim();
-            band.yearActive = tab[7].text.trim();*/
-            console.log(tab.text());
+            parseHTML(response.body, band);
         }
     });
+}
+
+const parseHTML = (html, band) =>{
+    const $ = cheerio.load(html);
+    band.location = $('#band_stats').find("dd").eq(1).text();
+    band.active = $('#band_stats').find("dd").eq(2).text();
+    band.formedIn = $('#band_stats').find("dd").eq(3).text();
+    band.lyricsTheme = $('#band_stats').find("dd").eq(5).text();
+    band.label = $('#band_stats').find("dd").eq(6).text();
+    band.yearActive = $('#band_stats').find("dd").eq(7).text().trim().replace(/\s+/g, " ");
+    if($('#logo').attr('href'))
+        band.logo = $('#logo').attr('href');
+    if($('#photo').attr('href'))    
+        band.photo = $('#photo').attr('href');
 }
 
 module.exports.startRequestBand = startRequestBand;
