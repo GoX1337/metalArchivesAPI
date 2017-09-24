@@ -38,13 +38,17 @@ router.use((req, res, next) => {
 });
     
 router.get('/bands', (req, res) => {
-    db.get().collection('death.metal').find({}).toArray((err, result) => {
-        if(!err){
-           res.status(200).send(result);
-       } else {
-           res.status(500).send(err);
-       }
-   });
+    if(!req.query.genre){
+        res.status(500).send({"message":"Pass a genre name as query parameter"});
+    } else {
+        db.get().collection(req.query.genre).find({}).toArray((err, result) => {
+            if(!err){
+                res.status(200).send(result);
+            } else {
+                res.status(500).send(err);
+            }
+        });
+    }
 });
 
 module.exports = router;
