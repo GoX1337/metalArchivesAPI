@@ -5,12 +5,14 @@ const db = require('./db');
 let displayStart = 0;
 let displayLength = 200;
 let totalRecords = -1;
+let q;
 
 const buildUrl = (query, displayStart, displayLength) => {
     return "https://www.metal-archives.com/search/ajax-band-search/?field=genre&query="+query+"&sEcho=1&iColumns=3&sColumns=&iDisplayStart="+displayStart+"&iDisplayLength="+displayLength+"&mDataProp_0=0&mDataProp_1=1&mDataProp_2=2";    
 }
 
 const startRequestBand = (query) => {
+    q = query;
     let url = buildUrl(query, displayStart, displayLength);
     request.get(url, (error, response, body) => {
         if(error){
@@ -21,7 +23,7 @@ const startRequestBand = (query) => {
             totalRecords = resp.iTotalRecords;
             parseResponse(resp);
             for(let i = displayLength; i <= totalRecords; i += displayLength ){
-                requestBands(buildUrl(query, i, displayLength));
+                //requestBands(buildUrl(query, i, displayLength));
             }
         }
     });
@@ -68,6 +70,12 @@ const getBandDetails = (band) => {
         } else {
             console.log("GET " + band.url);
             parseHTML(response.body, band);
+
+            db.get().collection(q.toLowerCase().replace("+", ".")).insertOne(band, (err, result) => {
+                if (!err) {
+                    console.log("New band inserted in db " + JSON.stringify(band));
+                }
+            });
         }
     });
 }
