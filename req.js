@@ -73,7 +73,7 @@ const getBandDetails = (band) => {
 
             db.get().collection(q.toLowerCase().replace("+", ".")).insertOne(band, (err, result) => {
                 if (!err) {
-                    console.log("New band inserted in db " + JSON.stringify(band));
+                    console.log("New band inserted in db " + band.name);
                 }
             });
         }
