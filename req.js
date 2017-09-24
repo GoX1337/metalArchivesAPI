@@ -25,7 +25,7 @@ const startRequestBand = (query) => {
             parseResponse(resp);
             for(let i = displayLength; i <= totalRecords; i += displayLength ){
                 delay += 5000;
-                setTimeout(requestBands(buildUrl(query, i, displayLength)), delay);
+                setTimeout(()=>{requestBands(buildUrl(query, i, displayLength))}, delay);
             }
         }
     });
