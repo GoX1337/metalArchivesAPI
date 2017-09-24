@@ -41,13 +41,14 @@ router.get('/bands', (req, res) => {
     if(!req.query.genre){
         res.status(500).send({"message":"Pass a genre name as query parameter"});
     } else {
+        let genre = req.query.genre.replace("_", ".").toLowerCase();
         let params = {};
         if(req.query.name)
             params.name = new RegExp(["^",  req.query.name.replace("_", " "), "$"].join(""), "i");
         if(req.query.country)
             params.country = new RegExp(["^", req.query.country.replace("_", " "), "$"].join(""), "i");
 
-        db.get().collection(req.query.genre).find(params).toArray((err, result) => {
+        db.get().collection(genre).find(params).toArray((err, result) => {
             if(!err){
                 res.status(200).send(result);
             } else {
