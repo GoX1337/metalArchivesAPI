@@ -6,6 +6,7 @@ let displayStart = 0;
 let displayLength = 200;
 let totalRecords = -1;
 let q;
+let delay = 0;
 
 const buildUrl = (query, displayStart, displayLength) => {
     return "https://www.metal-archives.com/search/ajax-band-search/?field=genre&query="+query+"&sEcho=1&iColumns=3&sColumns=&iDisplayStart="+displayStart+"&iDisplayLength="+displayLength+"&mDataProp_0=0&mDataProp_1=1&mDataProp_2=2";    
@@ -23,7 +24,8 @@ const startRequestBand = (query) => {
             totalRecords = resp.iTotalRecords;
             parseResponse(resp);
             for(let i = displayLength; i <= totalRecords; i += displayLength ){
-                //requestBands(buildUrl(query, i, displayLength));
+                delay += 5000;
+                setTimeout(requestBands(buildUrl(query, i, displayLength)), delay);
             }
         }
     });
