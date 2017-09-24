@@ -1,16 +1,16 @@
 {
   "name": "death-metal-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Steal and store all Metal Archive website data",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/GoX1337/deathMetalAPI.git"
   },
-  "author": "",
+  "author": "gox1337",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/GoX1337/deathMetalAPI/issues"

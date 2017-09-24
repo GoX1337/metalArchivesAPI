@@ -1,13 +1,15 @@
 const request = require('request');
 const cheerio = require('cheerio');
 
+let displayStart = 0;
+let displayLength = 200;
 let totalRecords = -1;
 
 const buildUrl = (query, displayStart, displayLength) => {
     return "https://www.metal-archives.com/search/ajax-band-search/?field=genre&query="+query+"&sEcho=1&iColumns=3&sColumns=&iDisplayStart="+displayStart+"&iDisplayLength="+displayLength+"&mDataProp_0=0&mDataProp_1=1&mDataProp_2=2";    
 }
 
-const startRequestBand = (query, displayStart, displayLength) => {
+const startRequestBand = (query) => {
     let url = buildUrl(query, displayStart, displayLength);
     request.get(url, (error, response, body) => {
         if(error){
