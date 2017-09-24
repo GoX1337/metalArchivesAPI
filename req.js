@@ -21,7 +21,7 @@ const startRequestBand = (query) => {
             totalRecords = resp.iTotalRecords;
             parseResponse(resp);
             for(let i = displayLength; i <= totalRecords; i += displayLength ){
-                //requestBands(buildUrl(query, i, displayLength));
+                requestBands(buildUrl(query, i, displayLength));
             }
         }
     });

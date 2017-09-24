@@ -11,8 +11,6 @@ if(process.argv.length > 2){
     process.exit(1);
 }
 
-req.startRequestBand(query);
-
 db.connect(config.database, (err) => {
     if (err) {
         console.log('Unable to connect to Mongo ' + config.database);
