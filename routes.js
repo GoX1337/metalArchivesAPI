@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('./config');
 const db = require('./db');
+const cache = require('./cache');
 
 const router = express.Router();
 let nbTokens = 0;
@@ -41,6 +42,11 @@ router.get('/bands', (req, res) => {
     if(!req.query.genre){
         res.status(500).send({"message":"Pass a genre name as query parameter"});
     } else {
+
+        cache.get(req, function(resp){
+            res.status(200).send(resp);
+        });
+
         let genre = req.query.genre.replace("_", ".").toLowerCase();
         let params = {};
         if(req.query.name)
