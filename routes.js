@@ -47,26 +47,48 @@ router.get('/bands', (req, res) => {
             params.name = new RegExp(["^",  req.query.name.replace("_", " "), "$"].join(""), "i");
         if(req.query.country)
             params.country = new RegExp(["^", req.query.country.replace("_", " "), "$"].join(""), "i");
+        if(req.query.location)
+            params.location = new RegExp(["^", req.query.location.replace("_", " "), "$"].join(""), "i");
 
-            let limit = parseInt(req.query.limit, 10);
-            if (isNaN(limit) || limit > maxPageSize) {
-                limit = maxPageSize;
-            } else if (limit < 1) {
-                limit = 1;
+        let limit = parseInt(req.query.limit, 10);
+        if (isNaN(limit) || limit > maxPageSize) {
+            limit = maxPageSize;
+        } else if (limit < 1) {
+            limit = 1;
+        }
+        let page = parseInt(req.query.page, 10);
+        if (isNaN(page) || page < 1) {
+            page = 1;
+        }
+        
+        db.get().collection(genre).find(params).skip((page - 1) * limit).limit(limit).toArray((err, result) => {
+            if(!err){
+                let resp = { "data": result}
+                res.status(200).send(resp);
+            } else {
+                res.status(500).send(err);
             }
-            let page = parseInt(req.query.page, 10);
-            if (isNaN(page) || page < 1) {
-                page = 1;
-            }
-            
-            db.get().collection(genre).find(params).skip((page - 1) * limit).limit(limit).toArray((err, result) => {
-                if(!err){
-                    let resp = { "data": result}
-                    res.status(200).send(resp);
-                } else {
+        });
+    }
+});
+
+router.get('/countries', (req, res) => {
+    if(!req.query.genre){
+        res.status(500).send({"message":"Pass a genre name as query parameter"});
+    } else {
+        let genre = req.query.genre.replace("_", ".").toLowerCase();
+        db.get().collection(genre).distinct(
+            "country",
+            {}, // query object
+            (function(err, docs){
+                if(err){
                     res.status(500).send(err);
                 }
-            });
+                if(docs){  
+                    res.status(200).send(docs.sort());
+                }
+            })
+        );
     }
 });
 
