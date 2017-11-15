@@ -44,7 +44,7 @@ router.get('/bands', (req, res) => {
         let genre = req.query.genre.replace("_", ".").toLowerCase();
         let params = {};
         if(req.query.name)
-            params.name = new RegExp(["^",  req.query.name.replace("_", " "), "$"].join(""), "i");
+            params.name = new RegExp(["^",".*", req.query.name.replace("_", " "),".*", "$"].join(""), "i");
         if(req.query.country)
             params.country = new RegExp(["^", req.query.country.replace("_", " "), "$"].join(""), "i");
         if(req.query.location)
@@ -61,7 +61,7 @@ router.get('/bands', (req, res) => {
             page = 1;
         }
         
-        db.get().collection(genre).find(params).skip((page - 1) * limit).limit(limit).toArray((err, result) => {
+        db.get().collection(genre).find(params).skip((page - 1) * limit).limit(limit).sort({name : 1}).toArray((err, result) => {
             if(!err){
                 let resp = { "data": result}
                 res.status(200).send(resp);
