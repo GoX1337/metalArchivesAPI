@@ -63,7 +63,23 @@ router.get('/bands', (req, res) => {
         
         db.get().collection(genre).find(params).skip((page - 1) * limit).limit(limit).sort({name : 1}).toArray((err, result) => {
             if(!err){
-                let resp = { "data": result}
+                let resp;
+                if(req.query.name){
+                    let bestMatch = [];
+                    let others = [];
+                    let rg = new RegExp(["^",req.query.name.replace("_", " "),".*", "$"].join(""), "i");
+                    result.forEach(function(b) {
+                        if(b.name.match(rg)){
+                            bestMatch.push(b);
+                        } else {
+                            others.push(b);
+                        }
+                    });
+                    resp = { "data": bestMatch.concat(others)};
+                } 
+                else {
+                    resp = { "data": result};
+                }
                 res.status(200).send(resp);
             } else {
                 res.status(500).send(err);
