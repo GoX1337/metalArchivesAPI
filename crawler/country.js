@@ -1,5 +1,5 @@
-const db = require('./db');
-const config = require('./config');
+const db = require('../db');
+const config = require('../config');
 let query;
 
 if(process.argv.length > 2){

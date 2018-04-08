@@ -2,7 +2,7 @@
 
 1) To start steal metal archives website data and save it in MongoDB:
 
-        node app.js "Death Metal"
+        node crawler/app.js "Death Metal"
 
 
 2) To start API (on port 1337 by default):
