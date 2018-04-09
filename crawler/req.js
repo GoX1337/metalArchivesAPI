@@ -1,5 +1,6 @@
 const request = require('request');
 const cheerio = require('cheerio');
+const bandcamp = require('bandcamp-scraper');
 const db = require('../db');
 
 let displayStart = 0;
@@ -8,18 +9,19 @@ let totalRecords = -1;
 let q;
 let delay = 0;
 
-var bandcamp = require('bandcamp-scraper');
+/*
 var params = {
     //query: 'Sacraments to the Sons of the Abyss'
     query: 'Ritualization'
 };
 bandcamp.search(params, function(error, searchResults) {
- if (error) {
-   console.log(error);
- } else {
-   console.log(searchResults);
- }
+    if (error) {
+        console.log(error);
+    } else {
+        console.log(searchResults);
+    }
 });
+*/
 
 const buildUrl = (query, displayStart, displayLength) => {
     return "https://www.metal-archives.com/search/ajax-band-search/?field=genre&query="+query+"&sEcho=1&iColumns=3&sColumns=&iDisplayStart="+displayStart+"&iDisplayLength="+displayLength+"&mDataProp_0=0&mDataProp_1=1&mDataProp_2=2";    
@@ -86,7 +88,6 @@ const getBandDetails = (band) => {
             console.log("error getBandDetails", JSON.stringify(error));
         } else {
             console.log("GET " + band.url);
-
             parseHTML(response.body, band, () => {
                 console.log(band);
                 if(!q) return;
@@ -114,7 +115,6 @@ const parseHTML = (html, band, cb) => {
     band.discogaphyUrl = $('#band_disco').find("li").eq(0).find("a").attr('href');
     band.reviewUrl = $('#band_tabs').find("a").eq(2).attr('href');
     band.relatedLinksUrl = $('#band_tabs').find("li").eq(4).find("a").attr('href');
-
     if($('#band_stats').find("dd").eq(6).find("a").attr('href'))
         band.labelUrl = $('#band_stats').find("dd").eq(6).find("a").attr('href');
     if($('#logo').attr('href'))
@@ -131,6 +131,7 @@ const parseHTML = (html, band, cb) => {
         }
         band.currentMembers.push(member);
     });
+
     band.pastMembers = [];
     $('#band_tab_members_past').find('tr[class=lineupRow]').each(function(i, elem) {
         let member = {
@@ -141,31 +142,27 @@ const parseHTML = (html, band, cb) => {
         band.pastMembers.push(member);
     });   
 
-    getOtherUrlsBandInfos(band, cb);
-}
-
-const getOtherUrlsBandInfos = (band, cb) => {
-    request.get(band.discogaphyUrl, (error, response, body) => {
-        if(error){
-            console.log("error getOtherUrlsBandInfos discogaphyUrl", JSON.stringify(error));
-        } else {
-            console.log("GET " + band.discogaphyUrl);
-            parseHTMLDisco(band, response.body);
-        }
-
-        request.get(band.relatedLinksUrl, (error, response, body) => {
-            if(error){
-                console.log("error getOtherUrlsBandInfos relatedLinksUrl", JSON.stringify(error));
-            } else {
-                console.log("GET " + band.relatedLinksUrl);
-                parseHTMLLinks(band, response.body);
-            }
+    getDiscography(band, () => {
+        getRelatedLinks(band, () => {
             cb();
         });
     });
 }
 
-const parseHTMLDisco = (band, html) => {
+const getDiscography = (band, cb) => {
+    request.get(band.discogaphyUrl, (error, response, body) => {
+        if(error){
+            console.log("error getDiscography ", JSON.stringify(error));
+        } else {
+            console.log("GET getDiscography " + band.discogaphyUrl);
+            parseHTMLDisco(band, response.body, () => {
+                cb();
+            }); 
+        } 
+    });
+}
+
+const parseHTMLDisco = (band, html, cb) => {
     const $ = cheerio.load(html);
     band.discography = [];
     $('tr').each(function(i, elem) {
@@ -178,7 +175,79 @@ const parseHTMLDisco = (band, html) => {
             }
             band.discography.push(item);
         }
-    });  
+    }); 
+    if(!band.discography)
+        cb();
+
+    for(let i = 0; i < band.discography.length; i++){
+        request.get(band.discography[i].url, (error, response, body) => {
+            if(error){
+                console.log("error parseHTMLDisco ", JSON.stringify(error));
+            } else {
+                console.log("GET parseHTMLDisco " + band.discography[i].url);
+                parseHtmlAlbum(band.discography[i], response.body);
+                if(i == band.discography.length - 1)
+                    cb();
+            }  
+        });  
+    };
+}
+
+const parseHtmlAlbum = (discoItem, html) => {
+    const $ = cheerio.load(html);
+    discoItem.releaseDate = $('#album_info').find("dd").eq(1).text();
+    discoItem.cover = $('#cover').attr('href');
+    discoItem.songs = [];
+    $('.table_lyrics').find("tr").each(function(i, elem) {
+        if(!$(this).hasClass("sideRow") && $(this).find("td").eq(0).text().trim()){
+            let song = {
+                number: $(this).find("td").eq(0).text().trim(),
+                name: $(this).find("td").eq(1).text().trim(),
+                length: $(this).find("td").eq(2).text().trim() ? $(this).find("td").eq(2).text().trim() : null
+            }
+            discoItem.songs.push(song);
+        }
+    }); 
+
+    discoItem.lineupMembers = [];
+    let band = "";
+    $('#album_members_lineup').find('tr').each(function(i, elem) {
+        if($(this).hasClass("lineupRow")){
+            let member = {
+                name: $(this).find("td").eq(0).text().trim(),
+                url: $(this).find("td").eq(0).find("a").attr('href'),
+                role: $(this).find("td").eq(1).text().trim(),
+                band: band
+            }
+            discoItem.lineupMembers.push(member);
+        } else {
+            band = $(this).find("td").find("strong").text().trim();
+        }
+    });
+
+    discoItem.miscMembers = [];
+    $('#album_members_misc').find('tr').each(function(i, elem) {
+        if($(this).hasClass("lineupRow")){
+            let member = {
+                name: $(this).find("td").eq(0).text().trim(),
+                url: $(this).find("td").eq(0).find("a").attr('href'),
+                role: $(this).find("td").eq(1).text().trim()
+            }
+            discoItem.miscMembers.push(member);
+        }
+    });
+}
+
+const getRelatedLinks = (band, cb) => {
+    request.get(band.relatedLinksUrl, (error, response, body) => {
+        if(error){
+            console.log("error getRelatedLinks ", JSON.stringify(error));
+        } else {
+            console.log("GET getRelatedLinks " + band.relatedLinksUrl);
+            parseHTMLLinks(band, response.body);
+        }
+        cb();
+    });
 }
 
 const parseHTMLLinks = (band, html) => {
@@ -193,8 +262,7 @@ const parseHTMLLinks = (band, html) => {
             url: $(this).attr('href')
         }
         band.relatedLink.official.push(link);
-    });  
-
+    });
     $('#band_links_Unofficial').find('a').each(function(i, elem) {
         let link = {
             name: $(this).text().trim(),
