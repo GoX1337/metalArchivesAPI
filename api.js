@@ -3,6 +3,7 @@ const app = express();
 const server = require('http').createServer(app);
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const moment = require('moment');
 const log = require('./logger');
 const db = require('./db');
 const config = require('./config');
@@ -11,7 +12,11 @@ const routes = require('./routes');
 const port = process.env.PORT || 1337;
 
 app.use(bodyParser.json());
-app.use(morgan('dev'));
+app.use(morgan(config.morganFormat));
+morgan.token('date', () => {
+    return new moment().format(config.timestampFormat);
+  })
+
 app.use('/api', routes);
 
 if(!process.env.APISECRET){

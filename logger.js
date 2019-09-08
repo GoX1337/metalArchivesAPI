@@ -10,7 +10,7 @@ const logger = createLogger({
     level: config.logLevel,
     format: format.combine(
         format.timestamp({
-            format: 'YYYY-MM-DD HH:mm:ss:SSS'
+            format: config.timestampFormat
         }),
         myFormat
     ),
