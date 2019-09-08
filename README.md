@@ -7,7 +7,7 @@
 
 2) To start API (on port 1337 by default):
 
-        PORT=<PORT_NUMBER> PORT=<PORT_NUMBER> node api.js
+        PORT=<YOUR_PORT_NUMBER> APISECRET=<YOUR_API_SECRET> node api.js
 
 
 3) To get a token: 
