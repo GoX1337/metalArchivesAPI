@@ -1,31 +1,30 @@
 const request = require('request');
 const cheerio = require('cheerio');
 const db = require('../db');
+const log = require('../logger');
 
 let displayStart = 0;
 let displayLength = 200;
 let totalRecords = -1;
-let q;
 let delay = 0;
 
-const buildUrl = (query, displayStart, displayLength) => {
-    return "https://www.metal-archives.com/search/ajax-band-search/?field=genre&query="+query+"&sEcho=1&iColumns=3&sColumns=&iDisplayStart="+displayStart+"&iDisplayLength="+displayLength+"&mDataProp_0=0&mDataProp_1=1&mDataProp_2=2";    
+const buildUrl = (displayStart, displayLength) => {
+    return "https://www.metal-archives.com/search/ajax-advanced/searching/bands/?bandName=&genre=&country=&yearCreationFrom=&yearCreationTo=&bandNotes=&status=&themes=&location=&bandLabelName=&sEcho=1&iColumns=3&sColumns=&iDisplayStart="+displayStart+"&iDisplayLength="+displayLength+"&mDataProp_0=0&mDataProp_1=1&mDataProp_2=2";    
 }
 
 const startRequestBand = (query) => {
-    q = query;
-    let url = buildUrl(query, displayStart, displayLength);
+    let url = buildUrl(displayStart, displayLength);
     request.get(url, (error, response, body) => {
         if(error){
-            console.log("error", JSON.stringify(error));
+            log.error(JSON.stringify(error));
         } else {
-            console.log("GET " + url);
+            log.info("GET " + url);
             let resp = JSON.parse(response.body);
             totalRecords = resp.iTotalRecords;
             parseResponse(resp);
             for(let i = displayLength; i <= totalRecords; i += displayLength ){
-                delay += 200000;
-                setTimeout(()=>{requestBands(buildUrl(query, i, displayLength))}, delay);
+                delay += 2700000;
+                setTimeout(()=>{requestBands(buildUrl(i, displayLength))}, delay);
             }
         }
     });
@@ -34,9 +33,9 @@ const startRequestBand = (query) => {
 const requestBands = (url) => {
     request.get(url, (error, response, body) => {
         if(error){
-            console.log("error requestBands", JSON.stringify(error));
+            log.error("error requestBands", JSON.stringify(error));
         } else {
-            console.log("GET " + url);
+            log.info("GET " + url);
             parseResponse(JSON.parse(response.body));
         }
     });
@@ -52,7 +51,7 @@ const parseResponse = (resp) => {
             "country": b[2],
             "url": n.url
         };
-        d += 1000;
+        d += 10000;
         setTimeout(()=>{getBandDetails(band)}, d);
     });
 }
@@ -70,15 +69,14 @@ const parseName = (url) => {
 const getBandDetails = (band) => {
     request.get(band.url, (error, response, body) => {
         if(error){
-            console.log("error getBandDetails", JSON.stringify(error));
+            log.error("error getBandDetails", JSON.stringify(error));
         } else {
-            console.log("GET " + band.url);
+            log.info("GET " + band.url);
             parseHTML(response.body, band, () => {
-                console.log(band);
-                if(!q) return;
-                db.get().collection(collectionName).insertOne(band, (err, result) => {
+                log.info(band);
+                db.get().collection("bands").insertOne(band, (err, result) => {
                     if (!err) {
-                        console.log("New band inserted in db " + band.name);
+                        log.info("New band inserted in db " + band.name);
                     }
                 });
             }); 
@@ -137,9 +135,9 @@ const parseHTML = (html, band, cb) => {
 const getDiscography = (band, cb) => {
     request.get(band.discogaphyUrl, (error, response, body) => {
         if(error){
-            console.log("error getDiscography ", JSON.stringify(error));
+            log.error("error getDiscography ", JSON.stringify(error));
         } else {
-            console.log("GET getDiscography " + band.discogaphyUrl);
+            log.info("GET getDiscography " + band.discogaphyUrl);
             parseHTMLDisco(band, response.body, () => {
                 cb();
             }); 
@@ -164,17 +162,22 @@ const parseHTMLDisco = (band, html, cb) => {
     if(!band.discography)
         cb();
 
-    for(let i = 0; i < band.discography.length; i++){
-        request.get(band.discography[i].url, (error, response, body) => {
-            if(error){
-                console.log("error parseHTMLDisco ", JSON.stringify(error));
-            } else {
-                console.log("GET parseHTMLDisco " + band.discography[i].url);
-                parseHtmlAlbum(band.discography[i], response.body);
-                if(i == band.discography.length - 1)
-                    cb();
-            }  
-        });  
+    let delay = 0;
+
+    for(let i = 0; i < band.discography.length; i++){ 
+        setTimeout(() => {
+            request.get(band.discography[i].url, (error, response, body) => {
+                if(error){
+                    log.error("error parseHTMLDisco ", JSON.stringify(error));
+                } else {
+                    log.info("GET parseHTMLDisco " + band.discography[i].url);
+                    parseHtmlAlbum(band.discography[i], response.body);
+                    if(i == band.discography.length - 1)
+                        cb();
+                }  
+            });
+        }, delay);
+        delay += 1500;
     };
 }
 
@@ -226,9 +229,9 @@ const parseHtmlAlbum = (discoItem, html) => {
 const getRelatedLinks = (band, cb) => {
     request.get(band.relatedLinksUrl, (error, response, body) => {
         if(error){
-            console.log("error getRelatedLinks ", JSON.stringify(error));
+            log.error("error getRelatedLinks ", JSON.stringify(error));
         } else {
-            console.log("GET getRelatedLinks " + band.relatedLinksUrl);
+            log.info("GET getRelatedLinks " + band.relatedLinksUrl);
             parseHTMLLinks(band, response.body);
         }
         cb();
