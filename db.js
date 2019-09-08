@@ -4,17 +4,14 @@ const state = {
   db: null
 }
 
-exports.connect = (url, done) => {
+exports.connect = (url, database, done) => {
   if (state.db) return done();
-  const client = MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
 
-  client.connect((err, db) => {
-    if (err) {
-      return done(err);
-    }
-    state.db = db;
-    done();
-  })
+  MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
+      if (err) return done(err);
+      state.db = client.db(database);
+      done();
+  }); 
 }
 
 exports.get = () => {

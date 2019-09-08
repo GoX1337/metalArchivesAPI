@@ -3,9 +3,8 @@ const jwt = require('jsonwebtoken');
 const db = require('./db');
 
 const router = express.Router();
-let nbTokens = 0;
-const maxPageSize = 100;
 
+const maxPageSize = 100;
 const secret = process.env.APISECRET;
 
 router.use((req, res, next) => {
