@@ -16,7 +16,7 @@ router.post('/register', (req, res) => {
             log.error(err);
             res.status(500).send();
         }
-        if (result.length > 0){
+        if (result && result.length > 0){
             let msg = "User " + req.body.username + " already exists";
             log.warn(msg + " ", result);
             res.status(200).send({message:msg});
