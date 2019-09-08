@@ -7,9 +7,11 @@ const router = express.Router();
 let nbTokens = 0;
 const maxPageSize = 100;
 
+const secret = process.env.APISECRET;
+
 router.post('/token', (req, res) => {
-    if(req.body.password == "topkek"){
-        var token = jwt.sign({"user": "user" + nbTokens++}, config.secret, {
+    if(req.body.password == secret){
+        var token = jwt.sign({"user": "user" + nbTokens++}, secret, {
             expiresIn: 60 * 60 * 24
         });
         res.status(200).send({"token": token});
@@ -21,7 +23,7 @@ router.post('/token', (req, res) => {
 router.use((req, res, next) => {
     const token = req.body.token || req.query.token || req.headers['x-access-token'];
     if (token) {
-        jwt.verify(token, config.secret, (err, decoded) => {      
+        jwt.verify(token, secret, (err, decoded) => {      
             if (err) {
                 return res.status(403).send({ success: false, message: 'Failed to authenticate token.' });    
             } else {

@@ -1,7 +1,7 @@
 {
   "name": "death-metal-api",
   "version": "1.0.0",
-  "description": "Steal and store all Metal Archive website data",
+  "description": "Metal Archive crawler and API",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
@@ -26,6 +26,7 @@
     "jsonwebtoken": "^8.0.1",
     "mongodb": "^2.2.31",
     "morgan": "^1.8.2",
-    "request": "^2.82.0"
+    "request": "^2.82.0",
+    "winston": "^3.2.1"
   }
 }

@@ -1,4 +1,4 @@
 module.exports = {
-    'secret': 'kek',
-    'database': 'mongodb://localhost:27017/metalBands'
+    logLevel: 'info',
+    database: 'mongodb://localhost:27017/metalBands'
 };
