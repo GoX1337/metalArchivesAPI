@@ -14,12 +14,17 @@ app.use(bodyParser.json());
 app.use(morgan('dev'));
 app.use('/api', routes);
 
+if(!process.env.APISECRET){
+    log.error('Define environment variable APISECRET');
+    process.exit(1);
+}
+
 db.connect(config.database, (err) => {
     if(err) {
         log.error('Unable to connect to Mongo ' + config.database);
         process.exit(1);
     } else {
-        server.listen(port, function() {
+        server.listen(port, () => {
             log.info('Node server API listening on port ' + port);
         });        
     }
