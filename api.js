@@ -21,7 +21,7 @@ morgan.token('date', () => {
 app.use('/api/v1/auth', auth);
 app.use('/api/v1', routes);
 
-db.connect(process.env.MONGODB_ADDON_URI || config.mongoUrl, config.database, (err) => {
+db.connect(process.env.MONGODB_ADDON_URI || config.mongoUrl, process.env.MONGODB_ADDON_DB || config.database, (err) => {
     if(err) {
         log.error('Unable to connect to Mongo ' + process.env.MONGODB_ADDON_URI || config.database);
         process.exit(1);
