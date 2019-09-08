@@ -1,5 +1,5 @@
 {
-  "name": "death-metal-api",
+  "name": "metal-archives-api",
   "version": "1.0.0",
   "description": "Metal Archive crawler and API",
   "main": "api.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GoX1337/deathMetalAPI.git"
+    "url": "git+https://github.com/GoX1337/metalArchivesAPI.git"
   },
   "author": "gox1337",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/GoX1337/deathMetalAPI/issues"
+    "url": "https://github.com/GoX1337/metalArchivesAPI/issues"
   },
-  "homepage": "https://github.com/GoX1337/deathMetalAPI#readme",
+  "homepage": "https://github.com/GoX1337/metalArchivesAPI#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
     "cherio": "^1.0.0-rc.2",

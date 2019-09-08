@@ -1,4 +1,4 @@
-# deathMetalAPI
+# metalArchivesAPI
 
 1) To start steal metal archives website data and save it in MongoDB:
 
