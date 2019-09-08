@@ -24,9 +24,9 @@ if(!process.env.APISECRET){
     process.exit(1);
 }
 
-db.connect(config.database, (err) => {
+db.connect(process.env.MONGODB_ADDON_URI || config.database, (err) => {
     if(err) {
-        log.error('Unable to connect to Mongo ' + config.database);
+        log.error('Unable to connect to Mongo ' + process.env.MONGODB_ADDON_URI || config.database);
         process.exit(1);
     } else {
         server.listen(port, () => {
