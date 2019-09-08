@@ -2,9 +2,9 @@
   "name": "death-metal-api",
   "version": "1.0.0",
   "description": "Metal Archive crawler and API",
-  "main": "app.js",
+  "main": "api.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node api.js"
   },
   "repository": {
     "type": "git",
@@ -17,16 +17,15 @@
   },
   "homepage": "https://github.com/GoX1337/deathMetalAPI#readme",
   "dependencies": {
-    "bandcamp-scraper": "^1.2.3",
-    "body-parser": "^1.18.2",
-    "cheerio": "^1.0.0-rc.2",
-    "express": "^4.15.4",
-    "express-jwt": "^5.3.0",
+    "body-parser": "^1.19.0",
+    "cherio": "^1.0.0-rc.2",
+    "express": "^4.17.1",
+    "express-jwt": "^5.3.1",
     "http": "0.0.0",
-    "jsonwebtoken": "^8.0.1",
-    "mongodb": "^2.2.31",
-    "morgan": "^1.8.2",
-    "request": "^2.82.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.3.2",
+    "morgan": "^1.9.1",
+    "request": "^2.88.0",
     "winston": "^3.2.1"
   }
 }

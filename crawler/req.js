@@ -1,6 +1,5 @@
 const request = require('request');
 const cheerio = require('cheerio');
-const bandcamp = require('bandcamp-scraper');
 const db = require('../db');
 
 let displayStart = 0;
@@ -8,20 +7,6 @@ let displayLength = 200;
 let totalRecords = -1;
 let q;
 let delay = 0;
-
-/*
-var params = {
-    //query: 'Sacraments to the Sons of the Abyss'
-    query: 'Ritualization'
-};
-bandcamp.search(params, function(error, searchResults) {
-    if (error) {
-        console.log(error);
-    } else {
-        console.log(searchResults);
-    }
-});
-*/
 
 const buildUrl = (query, displayStart, displayLength) => {
     return "https://www.metal-archives.com/search/ajax-band-search/?field=genre&query="+query+"&sEcho=1&iColumns=3&sColumns=&iDisplayStart="+displayStart+"&iDisplayLength="+displayLength+"&mDataProp_0=0&mDataProp_1=1&mDataProp_2=2";    

@@ -1,13 +1,14 @@
-var MongoClient = require('mongodb').MongoClient
+const MongoClient = require('mongodb').MongoClient
 
-var state = {
+const state = {
   db: null
 }
 
 exports.connect = (url, done) => {
   if (state.db) return done();
+  const client = MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
 
-  MongoClient.connect(url, (err, db) => {
+  client.connect((err, db) => {
     if (err) {
       return done(err);
     }
