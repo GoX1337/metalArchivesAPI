@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/GoX1337/metalArchivesAPI#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cherio": "^1.0.0-rc.2",
     "express": "^4.17.1",

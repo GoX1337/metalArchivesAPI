@@ -7,6 +7,7 @@ const moment = require('moment');
 const log = require('./logger');
 const db = require('./db');
 const config = require('./config');
+const auth = require('./auth');
 const routes = require('./routes');
 
 const port = process.env.PORT || 1337;
@@ -17,12 +18,8 @@ morgan.token('date', () => {
     return new moment().format(config.timestampFormat);
   })
 
-app.use('/api', routes);
-
-if(!process.env.APISECRET){
-    log.error('Define environment variable APISECRET');
-    process.exit(1);
-}
+app.use('/api/v1/auth', auth);
+app.use('/api/v1', routes);
 
 db.connect(process.env.MONGODB_ADDON_URI || config.database, (err) => {
     if(err) {
