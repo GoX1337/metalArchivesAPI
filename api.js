@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require("express-rate-limit");
 const app = express();
 const server = require('http').createServer(app);
 const bodyParser = require('body-parser');
@@ -16,7 +17,13 @@ app.use(bodyParser.json());
 app.use(morgan(config.morganFormat));
 morgan.token('date', () => {
     return new moment().format(config.timestampFormat);
-  })
+})
+
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100
+});
+app.use('/api/v1', apiLimiter);
 
 app.use('/api/v1/auth', auth);
 app.use('/api/v1', routes);
