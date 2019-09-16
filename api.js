@@ -13,6 +13,11 @@ const routes = require('./routes');
 
 const port = process.env.PORT || 1337;
 
+if(!process.env.APISECRET){
+    log.error('Define APISECRET env var');
+    process.exit(1);
+}
+
 app.use(bodyParser.json());
 app.use(morgan(config.morganFormat));
 morgan.token('date', () => {
@@ -21,7 +26,7 @@ morgan.token('date', () => {
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100
+    max: 25
 });
 app.use('/api/v1', apiLimiter);
 
