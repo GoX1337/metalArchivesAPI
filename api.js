@@ -26,7 +26,7 @@ morgan.token('date', () => {
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 25
+    max: 100
 });
 app.use('/api/v1', apiLimiter);
 
