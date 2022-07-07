@@ -28,7 +28,7 @@
     "fs": "0.0.1-security",
     "http": "0.0.0",
     "jsonwebtoken": "^8.5.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "mongodb": "^3.3.2",
     "morgan": "^1.9.1",
     "request": "^2.88.0",
